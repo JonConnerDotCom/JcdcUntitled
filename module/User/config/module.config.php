@@ -1,6 +1,7 @@
 <?php
 
 
+<<<<<<< HEAD
 return array(
 		'doctrine' => array(
 				'driver' => array(
@@ -14,3 +15,6 @@ return array(
 );
 
 
+=======
+return array();
+>>>>>>> 32cc6c485f972b78d9eacb4c39e3aad3af7251d4
