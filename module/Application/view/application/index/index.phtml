@@ -1,26 +1,157 @@
-<div class="hero-unit">
-    <h1><?php echo sprintf($this->translate('Welcome to %sZend Framework 2%s'), '<span class="zf-green">', '</span>') ?></h1>
-    <p><?php echo sprintf($this->translate('Congratulations! You have successfully installed the %sZF2 Skeleton Application%s. You are currently running Zend Framework version %s. This skeleton can serve as a simple starting point for you to begin building your application on ZF2.'), '<a href="https://github.com/zendframework/ZendSkeletonApplication" target="_blank">', '</a>', \Zend\Version\Version::VERSION) ?></p>
-    <p><a class="btn btn-success btn-large" href="https://github.com/zendframework/zf2" target="_blank"><?php echo $this->translate('Fork Zend Framework 2 on GitHub') ?> &raquo;</a></p>
-</div>
+<?php
+/**
+ * Zend Framework (http://framework.zend.com/)
+ *
+ * @link      http://github.com/zendframework/zf2 for the canonical source repository
+ * @copyright Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @package   Zend_ProgressBar
+ */
 
-<div class="row">
+use Zend\Loader\StandardAutoloader;
+use Zend\ProgressBar\Adapter\JsPush;
+use Zend\ProgressBar\ProgressBar;
 
-    <div class="span4">
-        <h2><?php echo $this->translate('Follow Development') ?></h2>
-        <p><?php echo sprintf($this->translate('Zend Framework 2 is under active development. If you are interested in following the development of ZF2, there is a special ZF2 portal on the official Zend Framework website which provides links to the ZF2 %swiki%s, %sdev blog%s, %sissue tracker%s, and much more. This is a great resource for staying up to date with the latest developments!'), '<a href="http://framework.zend.com/wiki/display/ZFDEV2/Home">', '</a>', '<a href="http://framework.zend.com/zf2/blog">', '</a>', '<a href="http://framework.zend.com/issues/browse/ZF2">', '</a>') ?></p>
-        <p><a class="btn btn-success" href="http://framework.zend.com/zf2" target="_blank"><?php echo $this->translate('ZF2 Development Portal') ?> &raquo;</a></p>
+/**
+ * This sample file demonstrates a simple use case of a jspush-driven progressbar
+ */
+
+if (isset($_GET['progress'])) {
+    $loader = new StandardAutoloader(array('autoregister_zf' => true));
+    $loader->register();
+
+    $adapter     = new JsPush(array('updateMethodName' => 'Zend_ProgressBar_Update',
+                                    'finishMethodName' => 'Zend_ProgressBar_Finish'));
+    $progressBar = new ProgressBar($adapter, 0, 100);
+
+    for ($i = 1; $i <= 100; $i++) {
+        if ($i < 20) {
+            $text = 'Just beginning';
+        } elseif ($i < 50) {
+            $text = 'A bit done';
+        } elseif ($i < 80) {
+            $text = 'Getting closer';
+        } else {
+            $text = 'Nearly done';
+        }
+
+        $progressBar->update($i, $text);
+        usleep(100000);
+    }
+
+    $progressBar->finish();
+
+    die;
+}
+?>
+<html>
+<head>
+    <title>Zend_ProgressBar Javascript Push Demo and Test</title>
+    <style type="text/css">
+        iframe {
+            position: absolute;
+            left: -100px;
+            top: -100px;
+
+            width: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        #progressbar {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+        }
+
+        .pg-progressbar {
+            position: relative;
+
+            width: 250px;
+            height: 24px;
+            overflow: hidden;
+
+            border: 1px solid #c6c6c6;
+        }
+
+        .pg-progress {
+            z-index: 150;
+
+            position: absolute;
+            left: 0;
+            top: 0;
+
+            width: 0;
+            height: 24px;
+            overflow: hidden;
+        }
+
+        .pg-progressstyle {
+            height: 22px;
+
+            border: 1px solid #748a9e;
+            background-image: url('animation.gif');
+        }
+
+        .pg-text,
+        .pg-invertedtext {
+            position: absolute;
+            left: 0;
+            top: 4px;
+
+            width: 250px;
+
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 12px;
+        }
+
+        .pg-invertedtext {
+            color: #ffffff;
+        }
+
+        .pg-text {
+            z-index: 100;
+            color: #000000;
+        }
+    </style>
+    <script type="text/javascript">
+        function startProgress()
+        {
+            var iFrame = document.createElement('iframe');
+            document.getElementsByTagName('body')[0].appendChild(iFrame);
+            iFrame.src = 'JsPush.php?progress';
+        }
+
+        function Zend_ProgressBar_Update(data)
+        {
+            document.getElementById('pg-percent').style.width = data.percent + '%';
+
+            document.getElementById('pg-text-1').innerHTML = data.text;
+            document.getElementById('pg-text-2').innerHTML = data.text;
+        }
+
+        function Zend_ProgressBar_Finish()
+        {
+            document.getElementById('pg-percent').style.width = '100%';
+
+            document.getElementById('pg-text-1').innerHTML = 'Demo done';
+            document.getElementById('pg-text-2').innerHTML = 'Demo done';
+        }
+    </script>
+</head>
+<body onload="startProgress();">
+    <div id="progressbar">
+        <div class="pg-progressbar">
+            <div class="pg-progress" id="pg-percent">
+                <div class="pg-progressstyle"></div>
+                <div class="pg-invertedtext" id="pg-text-1"></div>
+            </div>
+            <div class="pg-text" id="pg-text-2"></div>
+        </div>
     </div>
-
-    <div class="span4">
-        <h2><?php echo $this->translate('Discover Modules') ?></h2>
-        <p><?php echo sprintf($this->translate('The community is working on developing a community site to serve as a repository and gallery for ZF2 modules. The project is available %son GitHub%s. The site is currently live and currently contains a list of some of the modules already available for ZF2.'), '<a href="https://github.com/zendframework/modules.zendframework.com">', '</a>') ?></p>
-        <p><a class="btn btn-success" href="http://modules.zendframework.com/" target="_blank"><?php echo $this->translate('Explore ZF2 Modules') ?> &raquo;</a></p>
-   </div>
-
-   <div class="span4">
-       <h2><?php echo $this->translate('Help &amp; Support') ?></h2>
-       <p><?php echo sprintf($this->translate('If you need any help or support while developing with ZF2, you may reach us via IRC: %s#zftalk on Freenode%s. We\'d love to hear any questions or feedback you may have regarding the beta releases. Alternatively, you may subscribe and post questions to the %smailing lists%s.'), '<a href="irc://irc.freenode.net/zftalk">', '</a>', '<a href="http://framework.zend.com/wiki/display/ZFDEV/Mailing+Lists">', '</a>') ?></p>
-       <p><a class="btn btn-success" href="http://webchat.freenode.net?channels=zftalk" target="_blank"><?php echo $this->translate('Ping us on IRC') ?> &raquo;</a></p>
-   </div>
-</div>
+    <div id="progressBar">
+        <div id="progressDone"></div>
+    </div>
+</body>
+</html>

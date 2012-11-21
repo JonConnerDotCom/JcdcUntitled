@@ -1,7 +1,12 @@
 <?php
 return array(
+		
     'modules' => array(
         'Application',
+        'ApplicationManager',
+    	'User',
+		'DoctrineModule',
+		'DoctrineORMModule',
     ),
     'module_listener_options' => array(
         'config_glob_paths'    => array(
